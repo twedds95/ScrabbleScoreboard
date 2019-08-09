@@ -19,13 +19,6 @@ public class ScrabbleScoreboard {
  
         Scoreboard board = new Scoreboard(Width, Height);
  
-        JFrame Frame = new JFrame();
-        Frame.setBounds(100, 100, Width, Height);
-        Frame.setTitle("Scrabble Scoreboard");
-        Frame.setResizable(false);
-        Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Frame.add(board);
-        Frame.setVisible(true);
     }
 
     public static int getWidth() {
