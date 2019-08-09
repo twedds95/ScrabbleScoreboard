@@ -71,6 +71,8 @@ public class Scoreboard extends JFrame implements ActionListener {
     private int score1 = 0,
             score2 = 0,
             playedScore = 0,
+            letterMultiplier = 0,
+            multiplier = 1,
             turn = 0;
     
     private String playedWord;
@@ -157,6 +159,7 @@ public class Scoreboard extends JFrame implements ActionListener {
         playersLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JTword,
                 width / 2,
                 SpringLayout.WEST, JPplayers);
+        
         //Setup JPword panel, so only need to set visible when Word is entered
         JLscore.setBackground(Color.white);
         JLscore.setFont(Fscrabble);
@@ -167,6 +170,7 @@ public class Scoreboard extends JFrame implements ActionListener {
         JLscore.setPreferredSize(new Dimension(50, 50));
         JLscore.setVisible(false);
 
+        JLmultiplier.setPreferredSize(new Dimension(50, 50));
         JTBdoubleLetter.setPreferredSize(new Dimension(50, 50));
         JTBtripleLetter.setPreferredSize(new Dimension(50, 50));
         JBdoubleWord.setPreferredSize(new Dimension(50, 50));
@@ -174,11 +178,12 @@ public class Scoreboard extends JFrame implements ActionListener {
         JBbonusUndo.setPreferredSize(new Dimension(75, 50));
         JBaddWord.setPreferredSize(new Dimension(150, 50));
         JBendTurn.setPreferredSize(new Dimension(150, 50));
-        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JTBdoubleLetter, width / 6, SpringLayout.WEST, JPword);
-        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JTBtripleLetter, width * 2 / 6, SpringLayout.WEST, JPword);
-        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JBdoubleWord, width * 3 / 6, SpringLayout.WEST, JPword);
-        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JBtripleWord, width * 4 / 6, SpringLayout.WEST, JPword);
-        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JBbonusUndo, width * 5 / 6, SpringLayout.WEST, JPword);
+        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JLmultiplier, width*6 / 7, SpringLayout.WEST, JPword);
+        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JTBdoubleLetter, width / 7, SpringLayout.WEST, JPword);
+        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JTBtripleLetter, width * 2 / 7, SpringLayout.WEST, JPword);
+        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JBdoubleWord, width * 3 / 7, SpringLayout.WEST, JPword);
+        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JBtripleWord, width * 4 / 7, SpringLayout.WEST, JPword);
+        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JBbonusUndo, width * 5 / 7, SpringLayout.WEST, JPword);
         wordLayout.putConstraint(SpringLayout.WEST, JBendTurn, 10, SpringLayout.EAST, JLscore);
         wordLayout.putConstraint(SpringLayout.WEST, JBaddWord, 10, SpringLayout.EAST, JBendTurn);
         wordLayout.putConstraint(SpringLayout.WEST, JBendTurn, 10, SpringLayout.EAST, JLscore);
@@ -203,6 +208,7 @@ public class Scoreboard extends JFrame implements ActionListener {
         JBbonusUndo.setVisible(false);
         JBaddWord.setVisible(false);
         JBendTurn.setVisible(false);
+        JLmultiplier.setvisible(false);
         BGletterBonus.add(JTBdoubleLetter);
         BGletterBonus.add(JTBtripleLetter);
 
@@ -220,11 +226,90 @@ public class Scoreboard extends JFrame implements ActionListener {
         JPword.add(JBbonusUndo);
         JPword.add(JBendTurn);
         JPword.add(JBaddWord);
+        JPword.add(JLmultiplier);
         
         getContentPane().add(JPplayers);
         getContentPane().add(JPword);
         getContentPane().add(JPoptions);
+        
         // Action Listeners for Various Cmmponents
+        JTBdoubleLetter.addActionListener(letterBonusListener);
+        JTBtripleLetter.addActionListener(letterBonusListener);        
+        letterBonusListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e
+            ) {
+                if (JTBdoubleLetter.isSelected()){
+                    letterMultiplier = 1;
+                    JTBdoubleLetter.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                    JTBtripleLetter.setBorder(null);
+                }
+                elseif (JTBtripleLetter.isSelected()){
+                    letterMultiplier = 2;
+                    JTBtripleLetter.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                    JTBdoubleLetter.setBorder(null);
+                }
+                else {
+                    letterMultiplier = 0;
+                    JTBdoubleLetter.setBorder(null);
+                    JTBtripleLetter.setBorder(null);
+                }
+            }
+        }
+        
+        for(int l = 0; l<15; l++){
+        JBtiles[l].addActionListener(
+                new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e
+            ) {
+                char[] tileLetter = JBtiles[l].getText().toCharArray();
+                playedScore += multiplier*letterMultiplier*getLetterScore(tileLetter[0]); 
+                JLscore.setText(Integer.toString(playedScore));
+            }
+        }
+        );
+        }
+       JBbonusUndo.addActionListener(
+                new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e
+            ) {
+                playedScore = calculateScore(playedWord, JBtiles);
+                JLscore.setText(Integer.toString(playedScore);
+                multiplier = 1;
+                letterMultiplier = 0;
+                JLmultiplier.setvisible(false);                
+            }
+        }
+        );
+        
+        JBdoubleWord.addActionListener(
+                new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e
+            ) {
+                playedScore *= 2;
+                JLscore.setText(Integer.toString(playedScore);
+                multiplier *=2;
+                JLmultiplier.setText("x "+Integer.toString(multiplier));                
+                JLmultiplier.setvisible(true);                  
+            }
+        }
+        );
+            JBtripleWord.addActionListener(
+                new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e
+            ) {
+                playedScore *= 3;
+                JLscore.setText(Integer.toString(playedScore);
+                multiplier *=3;
+                JLmultiplier.setText("x "+Integer.toString(multiplier));                
+                JLmultiplier.setvisible(true);
+            }
+        }
+        );
 
         JBaddWord.addActionListener(new ActionListener() {
             @Override
@@ -240,6 +325,8 @@ public class Scoreboard extends JFrame implements ActionListener {
                     JLscore2.setText(Integer.toString(score2));
                 }
                 playedScore = 0;
+                multiplier = 1;
+                letterMultiplier = 0;
                 JTBdoubleLetter.setVisible(false);
                 JTBtripleLetter.setVisible(false);
                 JBdoubleWord.setVisible(false);
@@ -248,6 +335,7 @@ public class Scoreboard extends JFrame implements ActionListener {
                 JBaddWord.setVisible(false);
                 JBendTurn.setVisible(false);
                 JLscore.setVisible(false);
+                JLmultiplier.setVisible(false);  
                 JTword.setText("Enter Word");
                 for (int i = 0; i < playedWord.length(); i++) {
                     JBtiles[i].setVisible(false);
@@ -272,6 +360,8 @@ public class Scoreboard extends JFrame implements ActionListener {
                     JLscore2.setText(Integer.toString(score2));
                 }
                 playedScore = 0;
+                multiplier = 1;
+                letterMultiplier = 0;
                 JTBdoubleLetter.setVisible(false);
                 JTBtripleLetter.setVisible(false);
                 JBdoubleWord.setVisible(false);
@@ -280,6 +370,7 @@ public class Scoreboard extends JFrame implements ActionListener {
                 JBaddWord.setVisible(false);
                 JBendTurn.setVisible(false);
                 JLscore.setVisible(false);
+                JLmultiplier.setvisible(false);  
                 JTword.setText("Enter Word");
                 for (int i = 0; i < playedWord.length(); i++) {
                     JBtiles[i].setVisible(false);
@@ -297,6 +388,13 @@ public class Scoreboard extends JFrame implements ActionListener {
                 playedWord = JTword.getText();
                 playedScore = calculateScore(playedWord, JBtiles);
                 JTword.setText("Modify Word");
+                JTBdoubleLetter.setVisible(true);
+                JTBtripleLetter.setVisible(true);
+                JBdoubleWord.setVisible(true);
+                JBtripleWord.setVisible(true);
+                JBbonusUndo.setVisible(true);
+                JBendTurn.setVisible(true);
+                JBaddWord.setVisible(true);  
             }
         }
         );
@@ -311,15 +409,6 @@ public class Scoreboard extends JFrame implements ActionListener {
      */
     public int calculateScore(String word, JButton[] JBtile) {
         int score = 0;
-
-        JTBdoubleLetter.setVisible(true);
-        JTBtripleLetter.setVisible(true);
-        JBdoubleWord.setVisible(true);
-        JBtripleWord.setVisible(true);
-        JBbonusUndo.setVisible(true);
-        JBendTurn.setVisible(true);
-        JBaddWord.setVisible(true);
-
         int i = 0;
         for (char letter : word.toCharArray()) {
             JBtile[i].setText(String.valueOf(Character.toUpperCase(letter)));
@@ -339,9 +428,9 @@ public class Scoreboard extends JFrame implements ActionListener {
             score += getLetterScore(letter);
             i++;
         }
-        for (int j = word.length(); j < 15; j++) {
+        /*for (int j = word.length(); j < 15; j++) {
             JBtile[j].setVisible(false);
-        }
+        }*/
 
         JLscore.setText(Integer.toString(score));
         JLscore.setVisible(true);
