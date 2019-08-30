@@ -12,35 +12,39 @@ import javax.swing.JFrame;
  * @author Patrick Tweddell
  */
 public class ScrabbleScoreboard {
-
-    public static int WIDTH = 600, HEIGHT = 600;
+    
+    public static int width = 800, height = 600;
 
     public static void main(String[] args) {
- 
+
         //Create frame
-        Scoreboard board = new Scoreboard(WIDTH, HEIGHT);
-        board.setBounds(100, 100, WIDTH, HEIGHT);
-        board.setTitle("Scrabble Scoreboard");
-        board.setResizable(false);
-        board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        board.setVisible(true);
- 
+        JFrame frame = new JFrame();
+        Scoreboard board = new Scoreboard(width, height);
+        frame.setBounds(100, 100, width, height);
+        frame.setTitle("Scrabble Scoreboard");
+        frame.setResizable(false);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        frame.add(board);
+        //GameSetup setup = new GameSetup();
+        //frame.add(setup);
+
     }
 
     public static int getWidth() {
-        return WIDTH;
+        return width;
     }
 
-    public static void setWidth(int WIDTH) {
-        ScrabbleScoreboard.WIDTH = WIDTH;
+    public static void setWidth(int width) {
+        ScrabbleScoreboard.width = width;
     }
 
     public static int getHeight() {
-        return HEIGHT;
+        return height;
     }
 
-    public static void setHeight(int HEIGHT) {
-        ScrabbleScoreboard.HEIGHT = HEIGHT;
+    public static void setHeight(int height) {
+        ScrabbleScoreboard.height = height;
     }
 
 }
