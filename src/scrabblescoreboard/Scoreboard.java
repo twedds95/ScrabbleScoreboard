@@ -15,7 +15,6 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -26,7 +25,7 @@ import javax.swing.SpringLayout;
  *
  * @author Patrick Tweddell
  */
-public class Scoreboard extends JFrame implements ActionListener {
+public class Scoreboard extends JPanel implements ActionListener {
 
     /* A = 1, B = 3, C = 3, etc. */
     private static final int[] LETTER_SCORES = {
@@ -46,8 +45,8 @@ public class Scoreboard extends JFrame implements ActionListener {
             wordLayout = new SpringLayout(),
             optionsLayout = new SpringLayout();
 
-    JTextField JTname1 = new JTextField("Player 1", 15),
-            JTname2 = new JTextField("Player 2", 15),
+    JTextField JTname1 = new JTextField(),
+            JTname2 = new JTextField(),
             JTword = new JTextField("Enter word", 15);
 
     JLabel JLscore = new JLabel("", JLabel.CENTER),
@@ -95,37 +94,40 @@ public class Scoreboard extends JFrame implements ActionListener {
         JTname2.setBackground(Color.blue);
         JTname1.setHorizontalAlignment(JTextField.CENTER);
         JTname2.setHorizontalAlignment(JTextField.CENTER);
+        JTname1.setPreferredSize(new Dimension(125, 40));
+        JTname2.setPreferredSize(new Dimension(125, 40));
+        JTname1.setMaximumSize(new Dimension(200, 40));
+        JTname2.setMaximumSize(new Dimension(200, 40));
+        JTname1.setFont(Fscrabble);
+        JTname2.setFont(Fscrabble);
+        JTname1.setText("Player 1");
+        JTname2.setText("Player 2");
 
-        playersLayout.putConstraint(SpringLayout.WEST, JTname1,
-                width / 5,
+        playersLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JTname1,
+                width / 3,
                 SpringLayout.WEST, JPplayers);
-        playersLayout.putConstraint(SpringLayout.WEST, JTname2,
-                2 * width / 5 - 200,
-                SpringLayout.EAST, JTname1);
+        playersLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JTname2,
+                width * 2 / 3,
+                SpringLayout.WEST, JPplayers);
         playersLayout.putConstraint(SpringLayout.NORTH, JTname1,
                 10,
                 SpringLayout.NORTH, JPplayers);
         playersLayout.putConstraint(SpringLayout.NORTH, JTname2,
                 10,
                 SpringLayout.NORTH, JPplayers);
-        JTname1.setPreferredSize(new Dimension(100, 40));
-        JTname2.setPreferredSize(new Dimension(100, 40));
-        JTname1.setMaximumSize(new Dimension(100, 40));
-        JTname2.setMaximumSize(new Dimension(100, 40));
         JTname1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JTname1.setFont(Fscrabble);
                 JTname1.setForeground(Color.white);
             }
         });
         JTname2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JTname2.setFont(Fscrabble);
                 JTname2.setForeground(Color.white);
             }
         });
+
         //initialize scores on panel
         JLscore1.setBackground(Color.white);
         JLscore2.setBackground(Color.white);
@@ -151,10 +153,9 @@ public class Scoreboard extends JFrame implements ActionListener {
         playersLayout.putConstraint(SpringLayout.NORTH, JLscore2,
                 10,
                 SpringLayout.SOUTH, JTname2);
-
         JTword.setBackground(Color.red);
         JTword.setHorizontalAlignment(JTextField.CENTER);
-        JTword.setPreferredSize(new Dimension(100, 40));
+        JTword.setPreferredSize(new Dimension(125, 40));
         playersLayout.putConstraint(SpringLayout.NORTH, JTword,
                 25,
                 SpringLayout.SOUTH, JLscore1);
@@ -177,6 +178,8 @@ public class Scoreboard extends JFrame implements ActionListener {
         JLmultiplier.setVisible(false);
         JLmultiplier.setPreferredSize(new Dimension(50, 50));
         JTBdoubleLetter.setPreferredSize(new Dimension(50, 50));
+        JTBdoubleLetter.setSelected(false);
+        JTBtripleLetter.setSelected(false);
         JTBtripleLetter.setPreferredSize(new Dimension(50, 50));
         JBdoubleWord.setPreferredSize(new Dimension(50, 50));
         JBtripleWord.setPreferredSize(new Dimension(50, 50));
@@ -234,9 +237,9 @@ public class Scoreboard extends JFrame implements ActionListener {
         JPword.add(JBaddWord);
         JPword.add(JLmultiplier);
 
-        getContentPane().add(JPplayers);
-        getContentPane().add(JPword);
-        getContentPane().add(JPoptions);
+        add(JPplayers);
+        add(JPword);
+        add(JPoptions);
 
         // Action Listeners for Various Cmmponents        
         ActionListener letterBonusListener = new ActionListener() {
@@ -260,8 +263,9 @@ public class Scoreboard extends JFrame implements ActionListener {
         };
         JTBdoubleLetter.addActionListener(letterBonusListener);
         JTBtripleLetter.addActionListener(letterBonusListener);
+        
         for (int l = 0; l < 15; l++) {
-            final int index = l;
+             int index = l;
             JBtiles[l].addActionListener(
                     new ActionListener() {
                 @Override
@@ -281,7 +285,6 @@ public class Scoreboard extends JFrame implements ActionListener {
                 playedScore = calculateScore(playedWord, JBtiles);
                 JLscore.setText(Integer.toString(playedScore));
                 multiplier = 1;
-                letterMultiplier = 0;
                 JLmultiplier.setVisible(false);
             }
         }
@@ -327,7 +330,6 @@ public class Scoreboard extends JFrame implements ActionListener {
                 }
                 playedScore = 0;
                 multiplier = 1;
-                letterMultiplier = 0;
                 JTBdoubleLetter.setVisible(false);
                 JTBtripleLetter.setVisible(false);
                 JBdoubleWord.setVisible(false);
@@ -362,7 +364,6 @@ public class Scoreboard extends JFrame implements ActionListener {
                 }
                 playedScore = 0;
                 multiplier = 1;
-                letterMultiplier = 0;
                 JTBdoubleLetter.setVisible(false);
                 JTBtripleLetter.setVisible(false);
                 JBdoubleWord.setVisible(false);
@@ -387,17 +388,24 @@ public class Scoreboard extends JFrame implements ActionListener {
             public void actionPerformed(ActionEvent e
             ) {
                 playedWord = JTword.getText();
-                playedScore = calculateScore(playedWord, JBtiles);
-                JTword.setText("Modify Word");
-                multiplier = 1;
-                JLmultiplier.setVisible(false);
-                JTBdoubleLetter.setVisible(true);
-                JTBtripleLetter.setVisible(true);
-                JBdoubleWord.setVisible(true);
-                JBtripleWord.setVisible(true);
-                JBbonusUndo.setVisible(true);
-                JBendTurn.setVisible(true);
-                JBaddWord.setVisible(true);
+                try {
+                    playedScore = calculateScore(playedWord, JBtiles);
+                    JTword.setText("Modify Word");
+                    multiplier = 1;
+                    JLmultiplier.setVisible(false);
+                    JTBdoubleLetter.setVisible(true);
+                    JTBtripleLetter.setVisible(true);
+                    JBdoubleWord.setVisible(true);
+                    JBtripleWord.setVisible(true);
+                    JBbonusUndo.setVisible(true);
+                    JBendTurn.setVisible(true);
+                    JBaddWord.setVisible(true);
+                } catch (Exception ArrayIndexOutOfBoundsException) {
+                    JTword.setText("Illegal Word. Try Again.");
+                    for (int i = 0; i < 10; i++) {
+                        JBtiles[i].setVisible(false);
+                    }
+                }
             }
         }
         );
