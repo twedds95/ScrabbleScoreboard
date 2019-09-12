@@ -16,14 +16,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.io.File;
 import java.util.Arrays;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -74,6 +71,7 @@ public class Scoreboard implements ActionListener {
     private int[] scores = new int[4];
 
     private JPanel JPword = new JPanel(wordLayout);
+    private JButton JBskipTurn = new JButton("<html>" + "Change Letters (Skip Turn)" + "</htlm>");
     private JLabel JLmultiplier = new JLabel("", JLabel.CENTER);
     private JButton[] JBtiles = new JButton[15];
     private JLabel JLplayedScore = new JLabel("", JLabel.CENTER);
@@ -97,7 +95,8 @@ public class Scoreboard implements ActionListener {
             JBbonusUndo = new JButton("Undo"),
             JBendTurn = new JButton("End Turn"),
             JBaddWord = new JButton("Add Another Word"),
-            JBgameFinished = new JButton("Finish Game"),
+            JBgameFinished = new JButton("<html>" + "Finish Game (Player Finished)" + "</html>"),
+            JBgameFinishedNoMoves = new JButton("<html>" + "Finish Game (No Moves)" + "</html>"),
             JBnewGame = new JButton("New Game"),
             JBreset = new JButton("Reset");
 
@@ -212,6 +211,7 @@ public class Scoreboard implements ActionListener {
                 JBendTurn.setVisible(false);
                 JLplayedScore.setVisible(false);
                 JLmultiplier.setVisible(false);
+                JBskipTurn.setVisible(true);
                 JTword.setText("Enter Word");
                 for (int i = 0; i < playedWord.length(); i++) {
                     JBtiles[i].setVisible(false);
@@ -263,6 +263,7 @@ public class Scoreboard implements ActionListener {
                 for (Component component : Arrays.asList(JPword.getComponents())) {
                     component.setVisible(false);
                 }
+                JBskipTurn.setVisible(true);
             }
         };
     }
@@ -423,7 +424,13 @@ public class Scoreboard implements ActionListener {
         for (int i = 0; i < 15; i++) {
             JBtiles[i] = new JButton();
         }
-
+        JBskipTurn.setPreferredSize(new Dimension(150, 50));
+        wordLayout.putConstraint(SpringLayout.NORTH, JBskipTurn, 50, SpringLayout.NORTH, JPword);
+        wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JBskipTurn, 0, SpringLayout.HORIZONTAL_CENTER, JPword);
+        JBskipTurn.addActionListener(endTurnAction());
+        JBskipTurn.setVisible(true);
+        JPword.add(JBskipTurn);
+        
         //Setup JPword panel, so only need to set visible when Word is entered
         JLplayedScore.setBackground(Color.white);
         JLplayedScore.setFont(getFont());
@@ -517,10 +524,13 @@ public class Scoreboard implements ActionListener {
     public JPanel getJPoptions() {
         //Setup Options panel
         optionsLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JBreset,
-                getWidth() / 3,
+                getWidth() / 4,
                 SpringLayout.WEST, JPoptions);
         optionsLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JBgameFinished,
-                getWidth() * 2 / 3,
+                getWidth() * 2 / 4,
+                SpringLayout.WEST, JPoptions);
+        optionsLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JBgameFinishedNoMoves,
+                getWidth() * 3 / 4,
                 SpringLayout.WEST, JPoptions);
         optionsLayout.putConstraint(SpringLayout.NORTH, JBreset,
                 40,
@@ -528,14 +538,23 @@ public class Scoreboard implements ActionListener {
         optionsLayout.putConstraint(SpringLayout.NORTH, JBgameFinished,
                 40,
                 SpringLayout.NORTH, JPoptions);
+        optionsLayout.putConstraint(SpringLayout.NORTH, JBgameFinishedNoMoves,
+                40,
+                SpringLayout.NORTH, JPoptions);
+        JBreset.setPreferredSize(new Dimension(120, 50));
+        JBgameFinished.setPreferredSize(new Dimension(150, 50));
+        JBgameFinishedNoMoves.setPreferredSize(new Dimension(130, 50));
 
         JBreset.setVisible(true);
         JBgameFinished.setVisible(true);
+        JBgameFinishedNoMoves.setVisible(true);
         JBreset.addActionListener(resetAction());
         JBgameFinished.addActionListener(gameFinishedAction());
+        JBgameFinishedNoMoves.addActionListener(gameFinishedAction());
 
         JPoptions.add(JBreset);
         JPoptions.add(JBgameFinished);
+        JPoptions.add(JBgameFinishedNoMoves);
         return JPoptions;
     }
 
@@ -629,6 +648,13 @@ public class Scoreboard implements ActionListener {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (e.getSource()==JBgameFinishedNoMoves){
+                    JBconfirm.addActionListener(confirmActionNoMoves());
+                }
+                else  {
+                    JBconfirm.addActionListener(confirmAction());
+                }
+                
                 for (ActionListener listener : Arrays.asList(JTword.getActionListeners())) {
                     JTword.removeActionListener(listener);
                 }
@@ -639,13 +665,13 @@ public class Scoreboard implements ActionListener {
                     component.setVisible(false);
                 }
 
-                finishingPlayer = (turn + getNumPlayers() - 1) % getNumPlayers();
+                
                 JTword.setText("Enter remaining Letters");
                 JTword.addActionListener(remainingLettersAction());
+                finishingPlayer = (turn + getNumPlayers() - 1) % getNumPlayers();
                 wordLayout.putConstraint(SpringLayout.WEST, JBconfirm, 20, SpringLayout.EAST, JLplayedScore);
                 wordLayout.putConstraint(SpringLayout.VERTICAL_CENTER, JBconfirm, 0, SpringLayout.VERTICAL_CENTER, JLplayedScore);
                 JBconfirm.setVisible(false);
-                JBconfirm.addActionListener(confirmAction());
                 JPword.add(JBconfirm);
                 JBnewGame.addActionListener(newGameAction());
             }
@@ -700,6 +726,42 @@ public class Scoreboard implements ActionListener {
             }
         };
     }
+    
+    public ActionListener confirmActionNoMoves() {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JTword.setBackground(getPLAYERCOLOR((negativePlayer + 1) % getNumPlayers()));
+                JTword.setText("Enter remaining Letters:");
+                scores[negativePlayer] -= negativeScore;
+                JLscores[negativePlayer].setText(Integer.toString(scores[negativePlayer]));
+                negativeScore = 0;
+                finalTurn++;
+                JBconfirm.setVisible(false);
+                for (int i = 0; i < 7; i++) {
+                    JBtiles[i].setVisible(false);
+                    JLplayedScore.setVisible(false);
+                }
+
+                if (finalTurn == getNumPlayers()+1) {
+                    JTword.setText("Game Finished");
+                    JTword.setBackground(getPLAYERCOLOR(getwinningPlayer()));
+                    JTword.setEditable(false);
+                    JBconfirm.setVisible(false);
+                    JPword.remove(JBconfirm);
+                    JBnewGame.setPreferredSize(new Dimension(160, 50));
+                    optionsLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JBnewGame, 0, SpringLayout.HORIZONTAL_CENTER, JPoptions);
+                    optionsLayout.putConstraint(SpringLayout.VERTICAL_CENTER, JBnewGame, 0, SpringLayout.VERTICAL_CENTER, JPoptions);
+                    JPoptions.add(JBnewGame);
+                    JLwinningMessage.setText("Congratulations " + JTnames[getwinningPlayer()].getText() + "!");
+                    wordLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JLwinningMessage, 0, SpringLayout.HORIZONTAL_CENTER, JPword);
+                    wordLayout.putConstraint(SpringLayout.VERTICAL_CENTER, JLwinningMessage, 0, SpringLayout.VERTICAL_CENTER, JPword);
+                    JLwinningMessage.setFont(getFont());
+                    JPword.add(JLwinningMessage);
+                }
+            }
+        };
+    }
 
     public ActionListener wordAction() {
         return new ActionListener() {
@@ -711,6 +773,7 @@ public class Scoreboard implements ActionListener {
                     playedScore = calculateScore(playedWord, JBtiles);
                     JTword.setText("Modify Word");
                     multiplier = 1;
+                    JBskipTurn.setVisible(false);
                     JLmultiplier.setVisible(false);
                     JTBdoubleLetter.setVisible(true);
                     JTBtripleLetter.setVisible(true);
