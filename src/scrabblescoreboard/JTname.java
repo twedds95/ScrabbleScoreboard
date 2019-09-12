@@ -39,6 +39,7 @@ public class JTname extends JTextField {
                 JTname.this.select(0, 0);
             }
         });
+        
         addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
