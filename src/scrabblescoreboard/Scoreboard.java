@@ -57,7 +57,7 @@ public class Scoreboard implements ActionListener {
     private SpringLayout optionsLayout = new SpringLayout();
 
     private JPanel JPsetup = new JPanel(setupLayout);
-    private JLabel JLintroMessage = new JLabel("<html>" + "Welcome to Scrabble Scoreboard! Select the number of Players:" + "</html>");
+    private JLabel JLintroMessage = new JLabel("<html><p style =\"text-align: center\">Welcome to Scrabble Scoreboard! Select the number of Players:</p></html>");
     private String[] selectNumPlayers = {"2", "3", "4"};
     private JList<String> JLnumpLayers = new JList<String>(selectNumPlayers);
     private JButton JBstartGame = new JButton("Start Game");
@@ -71,7 +71,7 @@ public class Scoreboard implements ActionListener {
     private int[] scores = new int[4];
 
     private JPanel JPword = new JPanel(wordLayout);
-    private JButton JBskipTurn = new JButton("<html>" + "Change Letters (Skip Turn)" + "</htlm>");
+    private JButton JBskipTurn = new JButton("<html><p style=\"text-align:center\"> Change Letters (Skip Turn) </p> </html>");
     private JLabel JLmultiplier = new JLabel("", JLabel.CENTER);
     private JButton[] JBtiles = new JButton[15];
     private JLabel JLplayedScore = new JLabel("", JLabel.CENTER);
@@ -95,8 +95,8 @@ public class Scoreboard implements ActionListener {
             JBbonusUndo = new JButton("Undo"),
             JBendTurn = new JButton("End Turn"),
             JBaddWord = new JButton("Add Another Word"),
-            JBgameFinished = new JButton("<html>" + "Finish Game (Player Finished)" + "</html>"),
-            JBgameFinishedNoMoves = new JButton("<html>" + "Finish Game (No Moves)" + "</html>"),
+            JBgameFinished = new JButton("<html><p style =\"text-align: center\">Finish Game (Player Finished)</p></html>"),
+            JBgameFinishedNoMoves = new JButton("<html><p style =\"text-align: center\">Finish Game (No Moves)</p></html>"),
             JBnewGame = new JButton("New Game"),
             JBreset = new JButton("Reset");
 
@@ -140,6 +140,8 @@ public class Scoreboard implements ActionListener {
 
         setupLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JLnumpLayers, 0, SpringLayout.HORIZONTAL_CENTER, JPsetup);
         setupLayout.putConstraint(SpringLayout.NORTH, JLnumpLayers, 30, SpringLayout.SOUTH, JLintroMessage);
+        JLnumpLayers.setFixedCellWidth(50);
+        JLnumpLayers.setFixedCellHeight(50);
         JLnumpLayers.setFont(getFont());
         JLnumpLayers.setCursor(getCursor());
         JLnumpLayers.setVisible(true);
