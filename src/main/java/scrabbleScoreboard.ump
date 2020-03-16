@@ -1,0 +1,40 @@
+namespace ca.scrabblescoreboard.model;
+
+class Game
+{
+  int numberOfPlayers;
+  1 -- * Player;
+  0..1 -> 0..1 Player currentPlayer;
+}
+
+class Player
+{
+  enum Color {RED, CYAN, GREEN, YELLOW};
+  name;
+  int points;
+  lazy immutable Color color;
+  int currentRanking;
+  1 -- * Word;
+  0..1 -- * RemainingLetters;
+  0..1 -> 0..1 Word currentWord;
+}
+
+class Word
+{
+  spelling;
+  int points;
+}
+
+class RemainingLetters
+{
+  letters;
+  points;
+}
+
+class Bonus
+{
+  immutable optionName;
+  int multiplier;
+* -- * Word;
+}
+
