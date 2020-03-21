@@ -11,11 +11,12 @@ class Player
 {
   enum Color {RED, CYAN, GREEN, YELLOW};
   name;
-  int points;
+  int points = 0;
+  boolean invalidChallenge = false;
   lazy immutable Color color;
-  int currentRanking;
-  1 -- * Word;
-  0..1 -- * RemainingLetters;
+  int currentRanking = 1;
+  0..1 -- * Word;
+  0..1 -- 0..1 RemainingLetters;
   0..1 -> 0..1 Word currentWord;
 }
 
@@ -28,7 +29,7 @@ class Word
 class RemainingLetters
 {
   letters;
-  points;
+  int points;
 }
 
 class Bonus

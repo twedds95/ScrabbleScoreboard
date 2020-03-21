@@ -25,7 +25,6 @@ public class JTname extends JTextField {
     
     public JTname (String name){
         this.setText(name);
-        setBackground(Color.white);
         setHorizontalAlignment(JTextField.CENTER);
         setPreferredSize(new Dimension(125, 30));
         setMaximumSize(new Dimension(200, 30));
@@ -68,7 +67,6 @@ public class JTname extends JTextField {
                 if (index != -1){
                     Controller.changePlayerName(index, name);
                 }
-                setForeground(Color.white);
             }
         });
     }
