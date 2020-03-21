@@ -4,7 +4,7 @@
 package ca.scrabblescoreboard.model;
 import java.util.*;
 
-// line 22 "../../../scrabbleScoreboard.ump"
+// line 23 "../../../scrabbleScoreboard.ump"
 public class Word
 {
 
@@ -24,15 +24,10 @@ public class Word
   // CONSTRUCTOR
   //------------------------
 
-  public Word(String aSpelling, int aPoints, Player aPlayer)
+  public Word(String aSpelling, int aPoints)
   {
     spelling = aSpelling;
     points = aPoints;
-    boolean didAddPlayer = setPlayer(aPlayer);
-    if (!didAddPlayer)
-    {
-      throw new RuntimeException("Unable to create word due to player");
-    }
     bonuses = new ArrayList<Bonus>();
   }
 
@@ -70,6 +65,12 @@ public class Word
   {
     return player;
   }
+
+  public boolean hasPlayer()
+  {
+    boolean has = player != null;
+    return has;
+  }
   /* Code from template association_GetMany */
   public Bonus getBonus(int index)
   {
@@ -100,22 +101,20 @@ public class Word
     int index = bonuses.indexOf(aBonus);
     return index;
   }
-  /* Code from template association_SetOneToMany */
+  /* Code from template association_SetOptionalOneToMany */
   public boolean setPlayer(Player aPlayer)
   {
     boolean wasSet = false;
-    if (aPlayer == null)
-    {
-      return wasSet;
-    }
-
     Player existingPlayer = player;
     player = aPlayer;
     if (existingPlayer != null && !existingPlayer.equals(aPlayer))
     {
       existingPlayer.removeWord(this);
     }
-    player.addWord(this);
+    if (aPlayer != null)
+    {
+      aPlayer.addWord(this);
+    }
     wasSet = true;
     return wasSet;
   }
@@ -204,10 +203,10 @@ public class Word
 
   public void delete()
   {
-    Player placeholderPlayer = player;
-    this.player = null;
-    if(placeholderPlayer != null)
+    if (player != null)
     {
+      Player placeholderPlayer = player;
+      this.player = null;
       placeholderPlayer.removeWord(this);
     }
     ArrayList<Bonus> copyOfBonuses = new ArrayList<Bonus>(bonuses);

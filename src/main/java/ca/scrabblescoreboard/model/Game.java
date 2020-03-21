@@ -92,9 +92,9 @@ public class Game
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public Player addPlayer(String aName, int aPoints, int aCurrentRanking)
+  public Player addPlayer(String aName)
   {
-    return new Player(aName, aPoints, aCurrentRanking, this);
+    return new Player(aName, this);
   }
 
   public boolean addPlayer(Player aPlayer)

@@ -21,12 +21,13 @@ public class Player
   //Player Attributes
   private String name;
   private int points;
+  private boolean invalidChallenge;
   private Color color;
   private int currentRanking;
 
   //Player Associations
   private List<Word> words;
-  private List<RemainingLetters> remainingLetters;
+  private RemainingLetters remainingLetters;
   private Word currentWord;
   private Game game;
 
@@ -37,14 +38,14 @@ public class Player
   // CONSTRUCTOR
   //------------------------
 
-  public Player(String aName, int aPoints, int aCurrentRanking, Game aGame)
+  public Player(String aName, Game aGame)
   {
     name = aName;
-    points = aPoints;
+    points = 0;
+    invalidChallenge = false;
     canSetColor = true;
-    currentRanking = aCurrentRanking;
+    currentRanking = 1;
     words = new ArrayList<Word>();
-    remainingLetters = new ArrayList<RemainingLetters>();
     boolean didAddGame = setGame(aGame);
     if (!didAddGame)
     {
@@ -68,6 +69,14 @@ public class Player
   {
     boolean wasSet = false;
     points = aPoints;
+    wasSet = true;
+    return wasSet;
+  }
+
+  public boolean setInvalidChallenge(boolean aInvalidChallenge)
+  {
+    boolean wasSet = false;
+    invalidChallenge = aInvalidChallenge;
     wasSet = true;
     return wasSet;
   }
@@ -98,6 +107,11 @@ public class Player
   public int getPoints()
   {
     return points;
+  }
+
+  public boolean getInvalidChallenge()
+  {
+    return invalidChallenge;
   }
 
   public Color getColor()
@@ -139,35 +153,16 @@ public class Player
     int index = words.indexOf(aWord);
     return index;
   }
-  /* Code from template association_GetMany */
-  public RemainingLetters getRemainingLetter(int index)
+  /* Code from template association_GetOne */
+  public RemainingLetters getRemainingLetters()
   {
-    RemainingLetters aRemainingLetter = remainingLetters.get(index);
-    return aRemainingLetter;
-  }
-
-  public List<RemainingLetters> getRemainingLetters()
-  {
-    List<RemainingLetters> newRemainingLetters = Collections.unmodifiableList(remainingLetters);
-    return newRemainingLetters;
-  }
-
-  public int numberOfRemainingLetters()
-  {
-    int number = remainingLetters.size();
-    return number;
+    return remainingLetters;
   }
 
   public boolean hasRemainingLetters()
   {
-    boolean has = remainingLetters.size() > 0;
+    boolean has = remainingLetters != null;
     return has;
-  }
-
-  public int indexOfRemainingLetter(RemainingLetters aRemainingLetter)
-  {
-    int index = remainingLetters.indexOf(aRemainingLetter);
-    return index;
   }
   /* Code from template association_GetOne */
   public Word getCurrentWord()
@@ -190,21 +185,20 @@ public class Player
   {
     return 0;
   }
-  /* Code from template association_AddManyToOne */
-  public Word addWord(String aSpelling, int aPoints)
-  {
-    return new Word(aSpelling, aPoints, this);
-  }
-
+  /* Code from template association_AddManyToOptionalOne */
   public boolean addWord(Word aWord)
   {
     boolean wasAdded = false;
     if (words.contains(aWord)) { return false; }
     Player existingPlayer = aWord.getPlayer();
-    boolean isNewPlayer = existingPlayer != null && !this.equals(existingPlayer);
-    if (isNewPlayer)
+    if (existingPlayer == null)
     {
       aWord.setPlayer(this);
+    }
+    else if (!this.equals(existingPlayer))
+    {
+      existingPlayer.removeWord(aWord);
+      addWord(aWord);
     }
     else
     {
@@ -217,10 +211,10 @@ public class Player
   public boolean removeWord(Word aWord)
   {
     boolean wasRemoved = false;
-    //Unable to remove aWord, as it must always have a player
-    if (!this.equals(aWord.getPlayer()))
+    if (words.contains(aWord))
     {
       words.remove(aWord);
+      aWord.setPlayer(null);
       wasRemoved = true;
     }
     return wasRemoved;
@@ -257,76 +251,38 @@ public class Player
     }
     return wasAdded;
   }
-  /* Code from template association_MinimumNumberOfMethod */
-  public static int minimumNumberOfRemainingLetters()
+  /* Code from template association_SetOptionalOneToOptionalOne */
+  public boolean setRemainingLetters(RemainingLetters aNewRemainingLetters)
   {
-    return 0;
-  }
-  /* Code from template association_AddManyToOptionalOne */
-  public boolean addRemainingLetter(RemainingLetters aRemainingLetter)
-  {
-    boolean wasAdded = false;
-    if (remainingLetters.contains(aRemainingLetter)) { return false; }
-    Player existingPlayer = aRemainingLetter.getPlayer();
-    if (existingPlayer == null)
+    boolean wasSet = false;
+    if (aNewRemainingLetters == null)
     {
-      aRemainingLetter.setPlayer(this);
+      RemainingLetters existingRemainingLetters = remainingLetters;
+      remainingLetters = null;
+      
+      if (existingRemainingLetters != null && existingRemainingLetters.getPlayer() != null)
+      {
+        existingRemainingLetters.setPlayer(null);
+      }
+      wasSet = true;
+      return wasSet;
     }
-    else if (!this.equals(existingPlayer))
-    {
-      existingPlayer.removeRemainingLetter(aRemainingLetter);
-      addRemainingLetter(aRemainingLetter);
-    }
-    else
-    {
-      remainingLetters.add(aRemainingLetter);
-    }
-    wasAdded = true;
-    return wasAdded;
-  }
 
-  public boolean removeRemainingLetter(RemainingLetters aRemainingLetter)
-  {
-    boolean wasRemoved = false;
-    if (remainingLetters.contains(aRemainingLetter))
+    RemainingLetters currentRemainingLetters = getRemainingLetters();
+    if (currentRemainingLetters != null && !currentRemainingLetters.equals(aNewRemainingLetters))
     {
-      remainingLetters.remove(aRemainingLetter);
-      aRemainingLetter.setPlayer(null);
-      wasRemoved = true;
+      currentRemainingLetters.setPlayer(null);
     }
-    return wasRemoved;
-  }
-  /* Code from template association_AddIndexControlFunctions */
-  public boolean addRemainingLetterAt(RemainingLetters aRemainingLetter, int index)
-  {  
-    boolean wasAdded = false;
-    if(addRemainingLetter(aRemainingLetter))
-    {
-      if(index < 0 ) { index = 0; }
-      if(index > numberOfRemainingLetters()) { index = numberOfRemainingLetters() - 1; }
-      remainingLetters.remove(aRemainingLetter);
-      remainingLetters.add(index, aRemainingLetter);
-      wasAdded = true;
-    }
-    return wasAdded;
-  }
 
-  public boolean addOrMoveRemainingLetterAt(RemainingLetters aRemainingLetter, int index)
-  {
-    boolean wasAdded = false;
-    if(remainingLetters.contains(aRemainingLetter))
+    remainingLetters = aNewRemainingLetters;
+    Player existingPlayer = aNewRemainingLetters.getPlayer();
+
+    if (!equals(existingPlayer))
     {
-      if(index < 0 ) { index = 0; }
-      if(index > numberOfRemainingLetters()) { index = numberOfRemainingLetters() - 1; }
-      remainingLetters.remove(aRemainingLetter);
-      remainingLetters.add(index, aRemainingLetter);
-      wasAdded = true;
-    } 
-    else 
-    {
-      wasAdded = addRemainingLetterAt(aRemainingLetter, index);
+      aNewRemainingLetters.setPlayer(this);
     }
-    return wasAdded;
+    wasSet = true;
+    return wasSet;
   }
   /* Code from template association_SetUnidirectionalOptionalOne */
   public boolean setCurrentWord(Word aNewCurrentWord)
@@ -358,14 +314,13 @@ public class Player
 
   public void delete()
   {
-    for(int i=words.size(); i > 0; i--)
+    while( !words.isEmpty() )
     {
-      Word aWord = words.get(i - 1);
-      aWord.delete();
+      words.get(0).setPlayer(null);
     }
-    while( !remainingLetters.isEmpty() )
+    if (remainingLetters != null)
     {
-      remainingLetters.get(0).setPlayer(null);
+      remainingLetters.setPlayer(null);
     }
     currentWord = null;
     Game placeholderGame = game;
@@ -382,8 +337,10 @@ public class Player
     return super.toString() + "["+
             "name" + ":" + getName()+ "," +
             "points" + ":" + getPoints()+ "," +
+            "invalidChallenge" + ":" + getInvalidChallenge()+ "," +
             "currentRanking" + ":" + getCurrentRanking()+ "]" + System.getProperties().getProperty("line.separator") +
             "  " + "color" + "=" + (getColor() != null ? !getColor().equals(this)  ? getColor().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
+            "  " + "remainingLetters = "+(getRemainingLetters()!=null?Integer.toHexString(System.identityHashCode(getRemainingLetters())):"null") + System.getProperties().getProperty("line.separator") +
             "  " + "currentWord = "+(getCurrentWord()!=null?Integer.toHexString(System.identityHashCode(getCurrentWord())):"null") + System.getProperties().getProperty("line.separator") +
             "  " + "game = "+(getGame()!=null?Integer.toHexString(System.identityHashCode(getGame())):"null");
   }

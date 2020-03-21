@@ -3,7 +3,7 @@
 
 package ca.scrabblescoreboard.model;
 
-// line 28 "../../../scrabbleScoreboard.ump"
+// line 29 "../../../scrabbleScoreboard.ump"
 public class RemainingLetters
 {
 
@@ -13,7 +13,7 @@ public class RemainingLetters
 
   //RemainingLetters Attributes
   private String letters;
-  private String points;
+  private int points;
 
   //RemainingLetters Associations
   private Player player;
@@ -22,7 +22,7 @@ public class RemainingLetters
   // CONSTRUCTOR
   //------------------------
 
-  public RemainingLetters(String aLetters, String aPoints)
+  public RemainingLetters(String aLetters, int aPoints)
   {
     letters = aLetters;
     points = aPoints;
@@ -40,7 +40,7 @@ public class RemainingLetters
     return wasSet;
   }
 
-  public boolean setPoints(String aPoints)
+  public boolean setPoints(int aPoints)
   {
     boolean wasSet = false;
     points = aPoints;
@@ -53,7 +53,7 @@ public class RemainingLetters
     return letters;
   }
 
-  public String getPoints()
+  public int getPoints()
   {
     return points;
   }
@@ -68,19 +68,35 @@ public class RemainingLetters
     boolean has = player != null;
     return has;
   }
-  /* Code from template association_SetOptionalOneToMany */
-  public boolean setPlayer(Player aPlayer)
+  /* Code from template association_SetOptionalOneToOptionalOne */
+  public boolean setPlayer(Player aNewPlayer)
   {
     boolean wasSet = false;
-    Player existingPlayer = player;
-    player = aPlayer;
-    if (existingPlayer != null && !existingPlayer.equals(aPlayer))
+    if (aNewPlayer == null)
     {
-      existingPlayer.removeRemainingLetter(this);
+      Player existingPlayer = player;
+      player = null;
+      
+      if (existingPlayer != null && existingPlayer.getRemainingLetters() != null)
+      {
+        existingPlayer.setRemainingLetters(null);
+      }
+      wasSet = true;
+      return wasSet;
     }
-    if (aPlayer != null)
+
+    Player currentPlayer = getPlayer();
+    if (currentPlayer != null && !currentPlayer.equals(aNewPlayer))
     {
-      aPlayer.addRemainingLetter(this);
+      currentPlayer.setRemainingLetters(null);
+    }
+
+    player = aNewPlayer;
+    RemainingLetters existingRemainingLetters = aNewPlayer.getRemainingLetters();
+
+    if (!equals(existingRemainingLetters))
+    {
+      aNewPlayer.setRemainingLetters(this);
     }
     wasSet = true;
     return wasSet;
@@ -90,9 +106,7 @@ public class RemainingLetters
   {
     if (player != null)
     {
-      Player placeholderPlayer = player;
-      this.player = null;
-      placeholderPlayer.removeRemainingLetter(this);
+      player.setRemainingLetters(null);
     }
   }
 

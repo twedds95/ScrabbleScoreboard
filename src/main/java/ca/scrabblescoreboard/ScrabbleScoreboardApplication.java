@@ -6,6 +6,7 @@
 package ca.scrabblescoreboard;
 
 import ca.scrabblescoreboard.model.Game;
+import ca.scrabblescoreboard.view.Scoreboard;
 
 /**
  *

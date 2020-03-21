@@ -4,7 +4,7 @@
 package ca.scrabblescoreboard.model;
 import java.util.*;
 
-// line 34 "../../../scrabbleScoreboard.ump"
+// line 35 "../../../scrabbleScoreboard.ump"
 public class Bonus
 {
 
