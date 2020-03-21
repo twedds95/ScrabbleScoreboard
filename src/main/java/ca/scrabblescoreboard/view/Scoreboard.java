@@ -374,7 +374,7 @@ public class Scoreboard extends JFrame {
             JBchallenge[i].setPreferredSize(new Dimension(150, 30));
             JLscores[i].setFont(getFont());
             JLscores[i].setBorder(BorderFactory.createLineBorder(getPLAYERCOLOR(i), 3));
-            JLscores[i].setPreferredSize(new Dimension(40, 40));
+            JLscores[i].setPreferredSize(new Dimension(70, 40));
             JLscores[i].setOpaque(true);
             playersLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, JLscores[i],
                     0,
