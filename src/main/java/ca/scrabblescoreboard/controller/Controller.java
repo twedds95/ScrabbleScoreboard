@@ -26,13 +26,13 @@ public class Controller {
 			game.addPlayer(new Player("Player " + (i + 1), game));
 		}
 		game.setCurrentPlayer(game.getPlayer(0));
-		ScrabbleScoreboardApplication.setScoreboard(game);
+		ScrabbleScoreboardApplication.setCurrentGame(game);
 		return game;
 	}
 
 	public static int getCurrentPlayer(){
-    	Game game = ScrabbleScoreboardApplication.getScoreboard();
-    	Player player = ScrabbleScoreboardApplication.getScoreboard().getCurrentPlayer();
+    	Game game = ScrabbleScoreboardApplication.getCurrentGame();
+    	Player player = ScrabbleScoreboardApplication.getCurrentGame().getCurrentPlayer();
 		for (int i = 0; i < game.getNumberOfPlayers(); i++) {
 			if (player.getName().equals(game.getPlayer(i).getName())){
 				return i;
@@ -42,7 +42,7 @@ public class Controller {
 	}
 	
 	public static void changePlayerName (int index, String newName) {
-		Game game = ScrabbleScoreboardApplication.getScoreboard();
+		Game game = ScrabbleScoreboardApplication.getCurrentGame();
 		game.getPlayer(index).setName(newName);
 	}
 	
@@ -51,13 +51,13 @@ public class Controller {
         for (char letter : word.toCharArray()) {
             score += getLetterScore(letter);
         }
-        Player player = ScrabbleScoreboardApplication.getScoreboard().getCurrentPlayer();
+        Player player = ScrabbleScoreboardApplication.getCurrentGame().getCurrentPlayer();
         player.setCurrentWord(new Word(word, score));
         return score;		
 	}
 	
     public static int doubleLetter (Character c){
-		Game game = ScrabbleScoreboardApplication.getScoreboard();
+		Game game = ScrabbleScoreboardApplication.getCurrentGame();
 		Word word = game.getCurrentPlayer().getCurrentWord();
 		int score = word.getPoints();
 		int extraMultiplier = 1;
@@ -82,7 +82,7 @@ public class Controller {
     }
     
     public static int tripleLetter (Character c){
-		Game game = ScrabbleScoreboardApplication.getScoreboard();
+		Game game = ScrabbleScoreboardApplication.getCurrentGame();
 		Word word = game.getCurrentPlayer().getCurrentWord();
 		int score = word.getPoints();
 		int extraMultiplier = 1;
@@ -105,9 +105,35 @@ public class Controller {
         word.setPoints(score);
         return score;	
     }
+
+
+	public static int blankTile(char c) {
+		Game game = ScrabbleScoreboardApplication.getCurrentGame();
+		Word word = game.getCurrentPlayer().getCurrentWord();
+		int score = word.getPoints();
+		int extraMultiplier = 1;
+		for (Bonus bonus : word.getBonuses()) {
+			switch (bonus.getOptionName()){
+				case ("Double Word"):
+					extraMultiplier *= 2;
+					break;
+				case ("Triple Word"):
+					extraMultiplier *= 3;
+					break;
+				default:
+					extraMultiplier *= 1;
+					break;
+			}
+		}
+		Bonus blankLetter = new Bonus("Blank Letter", -1);
+		word.addBonus(blankLetter);
+		score += -1 * extraMultiplier * getLetterScore(c);
+		word.setPoints(score);
+		return score;
+	}
     
     public static int doubleWord (){
-		Game game = ScrabbleScoreboardApplication.getScoreboard();
+		Game game = ScrabbleScoreboardApplication.getCurrentGame();
 		Word word = game.getCurrentPlayer().getCurrentWord();
 		int score = word.getPoints();
     	Bonus doubleWord = new Bonus("Double Word", 2);
@@ -118,7 +144,7 @@ public class Controller {
     }
     
     public static int tripleWord (){
-    	Game game = ScrabbleScoreboardApplication.getScoreboard();
+    	Game game = ScrabbleScoreboardApplication.getCurrentGame();
     	Word word = game.getCurrentPlayer().getCurrentWord();
     	int score = word.getPoints();
     	Bonus tripleWord = new Bonus("Triple Word", 3);
@@ -129,7 +155,7 @@ public class Controller {
     }
 
 	public static int confirmWordAndAddAnother () {
-		Game game = ScrabbleScoreboardApplication.getScoreboard();
+		Game game = ScrabbleScoreboardApplication.getCurrentGame();
 		Player player = game.getCurrentPlayer();
 		player.addWord(player.getCurrentWord());
 		int score = player.getCurrentWord().getPoints();
@@ -139,7 +165,7 @@ public class Controller {
 	}
 
 	public static int confirmWord () {
-		Game game = ScrabbleScoreboardApplication.getScoreboard();
+		Game game = ScrabbleScoreboardApplication.getCurrentGame();
 		Player player = game.getCurrentPlayer();
 		player.addWord(player.getCurrentWord());
 		int score = player.getCurrentWord().getPoints();
@@ -150,14 +176,14 @@ public class Controller {
 	}
 
 	public static int addNegativeLettersToScore(int negativeScore, int playerIndex) {
-		Game game = ScrabbleScoreboardApplication.getScoreboard();
+		Game game = ScrabbleScoreboardApplication.getCurrentGame();
 		Player player = game.getPlayer(playerIndex);
 		player.setPoints(player.getPoints() + negativeScore);
 		return player.getPoints();
 	}
 
 	public static int getGameWinner() {
-		Game game = ScrabbleScoreboardApplication.getScoreboard();
+		Game game = ScrabbleScoreboardApplication.getCurrentGame();
 		int[] score = new int[game.getNumberOfPlayers()];
 		for (int i = 0; i < score.length; i++) {
 			score[i] = game.getPlayer(i).getPoints();
@@ -180,7 +206,7 @@ public class Controller {
 	}
 
 	public static boolean isWordValid(int challengerIndex) throws Exception {
-    	Game game = ScrabbleScoreboardApplication.getScoreboard();
+    	Game game = ScrabbleScoreboardApplication.getCurrentGame();
     	String word = game.getCurrentPlayer().getCurrentWord().getSpelling();
 		boolean result = URLReader.checkValidWord(word);
     	if (!result){
@@ -192,7 +218,7 @@ public class Controller {
     	return result;
 	}
 
-	private static void setNextPlayer(Game game) {
+	public static void setNextPlayer(Game game) {
 		Player player = game.getCurrentPlayer();
 		int turn = 0;
 		for (int i = 0; i < game.getNumberOfPlayers(); i++) {
@@ -209,7 +235,7 @@ public class Controller {
 	}
 
 	public static int removeNegativeLetterScore() {
-    	Game game = ScrabbleScoreboardApplication.getScoreboard();
+    	Game game = ScrabbleScoreboardApplication.getCurrentGame();
     	Player player = game.getCurrentPlayer();
     	String letters = player.getCurrentWord().getSpelling();
     	int negativeScore = player.getCurrentWord().getPoints();

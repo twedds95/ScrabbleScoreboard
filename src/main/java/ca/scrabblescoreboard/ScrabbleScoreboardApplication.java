@@ -14,24 +14,35 @@ import ca.scrabblescoreboard.view.Scoreboard;
  */
 public class ScrabbleScoreboardApplication {
 	
-	private static Game scoreboard;
+	private static Game currentGame;
+
+    public static Scoreboard getCurrentScoreboard() {
+        return currentScoreboard;
+    }
+
+    public static void setCurrentScoreboard(Scoreboard currentScoreboard) {
+        ScrabbleScoreboardApplication.currentScoreboard = currentScoreboard;
+    }
+
+    private static Scoreboard currentScoreboard;
    
-    public static void setScoreboard(Game scoreboard) {
-		ScrabbleScoreboardApplication.scoreboard = scoreboard;
+    public static void setCurrentGame(Game currentGame) {
+		ScrabbleScoreboardApplication.currentGame = currentGame;
 	}
 
 	public static void main(String[] args) {
     	// start UI
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Scoreboard().setVisible(true);
+                currentScoreboard = new Scoreboard();
+                currentScoreboard.setVisible(true);
             }
         });
        
     }
 
-	public static Game getScoreboard() {
-		return scoreboard;
+	public static Game getCurrentGame() {
+		return currentGame;
 	}
     
 }

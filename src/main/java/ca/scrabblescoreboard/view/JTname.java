@@ -25,11 +25,12 @@ public class JTname extends JTextField {
     
     public JTname (String name){
         this.setText(name);
-        setHorizontalAlignment(JTextField.CENTER);
-        setPreferredSize(new Dimension(125, 30));
-        setMaximumSize(new Dimension(200, 30));
-        setFont(new Font("gothic standard", Font.BOLD, 16));
-        addFocusListener(new FocusListener() {
+        this.setBackground(Color.white);
+        this.setHorizontalAlignment(JTextField.CENTER);
+        this.setPreferredSize(new Dimension(125, 30));
+        this.setMaximumSize(new Dimension(200, 30));
+        this.setFont(Scoreboard.getScrabbleFont());
+        this.addFocusListener(new FocusListener() {
 
             @Override
             public void focusGained(FocusEvent e) {
@@ -46,18 +47,17 @@ public class JTname extends JTextField {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int index = 0;
-                List<Player> playerList = ScrabbleScoreboardApplication.getScoreboard().getPlayers();
                 switch (JTname.this.getBackground().toString()){
-                    case ("Red"):
+                    case ("java.awt.Color[r=255,g=0,b=0]"):
                         index = 0;
                         break;
-                    case ("Cyan"):
+                    case ("java.awt.Color[r=0,g=255,b=255]"):
                         index = 1;
                         break;
-                    case ("Green"):
+                    case ("java.awt.Color[r=0,g=255,b=0]"):
                         index = 2;
                         break;
-                    case ("Yellow"):
+                    case ("java.awt.Color[r=255,g=255,b=0]"):
                         index = 3;
                         break;
                     default:
@@ -65,7 +65,7 @@ public class JTname extends JTextField {
                         break;
                 }
                 if (index != -1){
-                    Controller.changePlayerName(index, name);
+                    Controller.changePlayerName(index, JTname.this.getText());
                 }
             }
         });
